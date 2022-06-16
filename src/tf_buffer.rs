@@ -1,8 +1,8 @@
 use std::collections::{hash_map::Entry, HashMap, HashSet, VecDeque};
 
 // use r2r::builtin_interfaces::msg::{Duration, Time};
+use r2r::builtin_interfaces::msg::Time;
 use std::time::Duration;
-use std::time::time as Time;
 
 use r2r::geometry_msgs::msg::{Transform, TransformStamped};
 use r2r::std_msgs::msg::Header;

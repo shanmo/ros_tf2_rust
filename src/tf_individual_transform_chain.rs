@@ -1,4 +1,6 @@
-use r2r::builtin_interfaces::msg::{Duration, Time};
+// use r2r::builtin_interfaces::msg::{Duration, Time};
+use r2r::builtin_interfaces::msg::Time;
+use std::time::Duration;
 use r2r::geometry_msgs::msg::TransformStamped; 
 use r2r::std_msgs::msg::Header; 
 
@@ -21,7 +23,7 @@ pub(crate) struct TfIndividualTransformChain {
     static_tf: bool,
     //TODO:  Implement a circular buffer. Current method is slowww.
     pub(crate) transform_chain: Vec<OrderedTF>,
-    latest_stamp: Time,
+    latest_stamp: Duration,
 }
 
 impl TfIndividualTransformChain {
@@ -30,7 +32,7 @@ impl TfIndividualTransformChain {
             cache_duration,
             transform_chain: Vec::new(),
             static_tf,
-            latest_stamp: Time::from_nanos(0),
+            latest_stamp: Duration::from_nanos(0),
         }
     }
 
@@ -47,10 +49,10 @@ impl TfIndividualTransformChain {
             Err(x) => self.transform_chain.insert(x, OrderedTF { tf: msg }),
         }
 
-        let time_to_keep = if self.latest_stamp > Time::from_nanos(0) + self.cache_duration {
+        let time_to_keep = if self.latest_stamp > Duration::from_nanos(0) + self.cache_duration {
             self.latest_stamp - self.cache_duration
         } else {
-            Time::from_nanos(0)
+            Duration::from_nanos(0)
         };
         while !self.transform_chain.is_empty() {
             if let Some(first) = self.transform_chain.first() {
