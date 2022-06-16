@@ -1,14 +1,17 @@
-use rosrust::{Duration, Time};
+use r2r::builtin_interfaces::msg::{Duration, Time};
+use r2r::geometry_msgs::msg::TransformStamped; 
+use r2r::std_msgs::msg::Header; 
 
 use crate::{
     ordered_tf::OrderedTF,
     tf_error::TfError,
     transforms::{
-        geometry_msgs::TransformStamped, interpolate, std_msgs::Header, to_transform_stamped,
+        interpolate, 
+        to_transform_stamped,
     },
 };
 
-fn get_nanos(dur: rosrust::Duration) -> i64 {
+fn get_nanos(dur: Duration) -> i64 {
     i64::from(dur.sec) * 1_000_000_000 + i64::from(dur.nsec)
 }
 
@@ -60,7 +63,7 @@ impl TfIndividualTransformChain {
         }
     }
 
-    pub fn get_closest_transform(&self, time: rosrust::Time) -> Result<TransformStamped, TfError> {
+    pub fn get_closest_transform(&self, time: Time) -> Result<TransformStamped, TfError> {
         if self.static_tf {
             return Ok(self.transform_chain.last().unwrap().tf.clone());
         }
@@ -114,7 +117,7 @@ impl TfIndividualTransformChain {
         }
     }
 
-    pub fn has_valid_transform(&self, time: rosrust::Time) -> bool {
+    pub fn has_valid_transform(&self, time: Time) -> bool {
         if self.static_tf {
             return true;
         }

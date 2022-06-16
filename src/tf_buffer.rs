@@ -1,6 +1,12 @@
 use std::collections::{hash_map::Entry, HashMap, HashSet, VecDeque};
 
-use rosrust::Duration;
+// use r2r::builtin_interfaces::msg::{Duration, Time};
+use std::time::Duration;
+use std::time::time as Time;
+
+use r2r::geometry_msgs::msg::{Transform, TransformStamped};
+use r2r::std_msgs::msg::Header;
+use r2r::tf2_msgs::msg::TFMessage;
 
 use crate::{
     tf_error::TfError,
@@ -8,11 +14,7 @@ use crate::{
     tf_individual_transform_chain::TfIndividualTransformChain,
     transforms::{
         chain_transforms,
-        geometry_msgs::{Transform, TransformStamped},
         get_inverse,
-        std_msgs::Header,
-        tf2_msgs::TFMessage,
-        to_transform_stamped,
     },
 };
 
@@ -72,7 +74,7 @@ impl TfBuffer {
         &self,
         from: String,
         to: String,
-        time: rosrust::Time,
+        time: Time,
     ) -> Result<Vec<String>, TfError> {
         let mut res = vec![];
         let mut frontier: VecDeque<String> = VecDeque::new();
@@ -132,7 +134,7 @@ impl TfBuffer {
         &self,
         from: &str,
         to: &str,
-        time: rosrust::Time,
+        time: Time,
     ) -> Result<TransformStamped, TfError> {
         let from = from.to_string();
         let to = to.to_string();
@@ -171,32 +173,6 @@ impl TfBuffer {
             }
             Err(x) => Err(x),
         }
-    }
-
-    pub(crate) fn lookup_transform_with_time_travel(
-        &self,
-        to: &str,
-        time2: rosrust::Time,
-        from: &str,
-        time1: rosrust::Time,
-        fixed_frame: &str,
-    ) -> Result<TransformStamped, TfError> {
-        let tf1 = self.lookup_transform(from, fixed_frame, time1);
-        let tf2 = self.lookup_transform(to, fixed_frame, time2);
-        if let Err(x) = tf1 {
-            return Err(x);
-        }
-        if let Err(x) = tf2 {
-            return Err(x);
-        }
-        let transforms = get_inverse(&tf1.unwrap());
-        let result = chain_transforms(&[tf2.unwrap().transform, transforms.transform]);
-        Ok(to_transform_stamped(
-            result,
-            from.to_string(),
-            to.to_string(),
-            time1,
-        ))
     }
 }
 
@@ -370,52 +346,6 @@ mod test {
             },
         };
         assert_eq!(res.unwrap(), expected);
-    }
-
-    /// Tests an interpolated lookup.
-    #[test]
-    fn test_basic_tf_timetravel() {
-        let mut tf_buffer = TfBuffer::new();
-        build_test_tree(&mut tf_buffer, 0f64);
-        build_test_tree(&mut tf_buffer, 1f64);
-        let res = tf_buffer.lookup_transform_with_time_travel(
-            "camera",
-            rosrust::Time {
-                sec: 0,
-                nsec: 400_000_000,
-            },
-            "camera",
-            rosrust::Time {
-                sec: 0,
-                nsec: 700_000_000,
-            },
-            "item",
-        );
-        let expected = TransformStamped {
-            child_frame_id: "camera".to_string(),
-            header: Header {
-                frame_id: "camera".to_string(),
-                stamp: rosrust::Time {
-                    sec: 0,
-                    nsec: 700_000_000,
-                },
-                seq: 1,
-            },
-            transform: Transform {
-                rotation: Quaternion {
-                    x: 0f64,
-                    y: 0f64,
-                    z: 0f64,
-                    w: 1f64,
-                },
-                translation: Vector3 {
-                    x: 0f64,
-                    y: 0.3f64,
-                    z: 0f64,
-                },
-            },
-        };
-        assert_approx_eq(res.unwrap(), expected);
     }
 
     #[test]
