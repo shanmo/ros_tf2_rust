@@ -1,9 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
-use rosrust::Time;
 use thiserror::Error;
 
-use crate::transforms::geometry_msgs::TransformStamped;
+use r2r::geometry_msgs::msg::TransformStamped;
+use r2r::builtin_interfaces::msg::Time;
 
 /// Enumerates the different types of errors
 #[derive(Clone, Debug, Error)]
