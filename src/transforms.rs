@@ -48,8 +48,7 @@ pub fn isometry_to_transform(iso: Isometry3<f64>) -> Transform {
 pub fn get_inverse(trans: &TransformStamped) -> TransformStamped {
     TransformStamped {
         header: Header {
-            seq: 1u32,
-            stamp: trans.header.stamp,
+            stamp: trans.header.stamp.clone(),
             frame_id: trans.child_frame_id.clone(),
         },
         child_frame_id: trans.header.frame_id.clone(),
@@ -215,7 +214,6 @@ pub(crate) fn to_transform_stamped(
         header: Header {
             frame_id: from,
             stamp: time,
-            seq: 1u32,
         },
         child_frame_id: to,
         transform: tf,
