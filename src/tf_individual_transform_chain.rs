@@ -105,8 +105,8 @@ impl TfIndividualTransformChain {
                     .tf
                     .child_frame_id
                     .clone();
-                let total_duration = Duration{ sec: time2.sec - time1.sec, nanosec: 0 };
-                let desired_duration = Duration{ sec: time.sec - time1.sec, nanosec: 0 };
+                let total_duration = Duration{ sec: time2.sec - time1.sec, nanosec: time2.nanosec - time1.nanosec };
+                let desired_duration = Duration{ sec: time.sec - time1.sec, nanosec: time.nanosec - time1.nanosec };
                 let weight = 1.0 - 
                     get_nanos_from_duration(&desired_duration) as f64 / 
                     get_nanos_from_duration(&total_duration) as f64;

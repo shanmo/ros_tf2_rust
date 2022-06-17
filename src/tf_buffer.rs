@@ -424,7 +424,7 @@ mod test {
 
     #[test]
     fn test_cache_duration() {
-        let mut tf_buffer = TfBuffer::new_with_duration(Duration { sec: 1, nanosec: 0 });
+        let mut tf_buffer = TfBuffer::new_with_duration(Duration { sec: 0, nanosec: 1_000_000_000 });
         let transform00 = TransformStamped {
             header: Header {
                 frame_id: PARENT.to_string(),
@@ -437,7 +437,7 @@ mod test {
         let transform01 = TransformStamped {
             header: Header {
                 frame_id: PARENT.to_string(),
-                stamp: Time { sec: 1, nanosec: 0 },
+                stamp: Time { sec: 0, nanosec: 1_000_000_000 },
                 ..Default::default()
             },
             child_frame_id: CHILD0.to_string(),
@@ -446,7 +446,7 @@ mod test {
         let transform02 = TransformStamped {
             header: Header {
                 frame_id: PARENT.to_string(),
-                stamp: Time { sec: 2, nanosec: 0 },
+                stamp: Time { sec: 0, nanosec: 2_000_000_000 },
                 ..Default::default()
             },
             child_frame_id: CHILD0.to_string(),
@@ -531,20 +531,6 @@ mod test {
                 .stamp,
             Time{ sec: 0, nanosec: 2_000_000_000 }
         );
-    }
-
-    fn assert_approx_eq(msg1: TransformStamped, msg2: TransformStamped) {
-        assert_eq!(msg1.header, msg2.header);
-        assert_eq!(msg1.child_frame_id, msg2.child_frame_id);
-
-        assert!((msg1.transform.rotation.x - msg2.transform.rotation.x).abs() < 1e-9);
-        assert!((msg1.transform.rotation.y - msg2.transform.rotation.y).abs() < 1e-9);
-        assert!((msg1.transform.rotation.z - msg2.transform.rotation.z).abs() < 1e-9);
-        assert!((msg1.transform.rotation.w - msg2.transform.rotation.w).abs() < 1e-9);
-
-        assert!((msg1.transform.translation.x - msg2.transform.translation.x).abs() < 1e-9);
-        assert!((msg1.transform.translation.y - msg2.transform.translation.y).abs() < 1e-9);
-        assert!((msg1.transform.translation.z - msg2.transform.translation.z).abs() < 1e-9);
     }
 
     /// Tests a case in which the tree structure changes dynamically
