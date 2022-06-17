@@ -9,7 +9,15 @@ use r2r::builtin_interfaces::msg::Time;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ctx = r2r::Context::create()?;
     let mut node = r2r::Node::create(ctx, "listener_node", "")?;
+    
+    {
+        let params = &mut node.params.lock().unwrap();
+        let use_sim_time = params.entry("use_sim_time".to_string()).or_insert(r2r::ParameterValue::Bool(true));
+        println!("use sim time {:?}", use_sim_time); 
+    }
+
     let listener = TfListener::new();
+    let mut clock = r2r::Clock::create(r2r::ClockType::RosTime)?;
 
     let sub = node.subscribe::<r2r::tf2_msgs::msg::TFMessage>("/tf", QosProfile::default())?;
 
@@ -18,8 +26,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     sub.for_each(|msg| {
-        let tf = listener.lookup_transform("base_link", "odom", Time { sec: 0, nanosec: 0 }, msg);
-        println!("tf {:?}", tf);
+        let now = clock.get_now().unwrap();
+        let time = r2r::Clock::to_builtin_time(&now);
+        println!("now {:?}", time); 
+        let tf = listener.lookup_transform("base_link", "odom", time, msg);
+        // println!("tf {:?}", tf);
         future::ready(())
     })
     .await;

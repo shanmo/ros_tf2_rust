@@ -70,6 +70,7 @@ impl TfIndividualTransformChain {
         res.header.stamp = time.clone();
         res.transform.rotation.w = 1f64;
 
+        println!("self.transform_chain {:?}", self.transform_chain); 
         let res = self.transform_chain.binary_search(&OrderedTF { tf: res });
 
         match res {
@@ -121,6 +122,7 @@ impl TfIndividualTransformChain {
         if self.static_tf {
             return true;
         }
+        println!("self.transform_chain {:?}", self.transform_chain); 
         !matches!(self.transform_chain.binary_search(&OrderedTF {
             tf: TransformStamped {
                 header: Header {

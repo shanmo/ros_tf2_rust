@@ -83,17 +83,25 @@ impl TfBuffer {
         visited.insert(from.clone());
         frontier.push_front(from.clone());
 
+        println!("from {:?}", from); 
+        println!("to {:?}", to); 
+        println!("frontier {:?}", frontier);
+
         while !frontier.is_empty() {
             let current_node = frontier.pop_front().unwrap();
+            println!("current_node {:?}", current_node);
             if current_node == to {
                 break;
             }
             if let Some(children) = self.child_transform_index.get(&current_node) {
+                
                 for v in children {
                     if visited.contains(v) {
                         continue;
                     }
-
+                    
+                    println!("child {:?}", v);
+                    println!("parent {:?}", current_node);
                     if self
                         .transform_data
                         .get(&TfGraphNode {
@@ -110,10 +118,11 @@ impl TfBuffer {
             }
         }
         let mut r = to.clone();
+        println!("parents {:?}", parents);
         while r != from {
             res.push(r.clone());
             let parent = parents.get(&r);
-
+            println!("parent {:?}", parent);
             match parent {
                 Some(x) => r = x.to_string(),
                 None => {
@@ -139,9 +148,10 @@ impl TfBuffer {
         let from = from.to_string();
         let to = to.to_string();
         let path = self.retrieve_transform_path(from.clone(), to.clone(), time.clone());
-
+        println!("path {:?}", path); 
         match path {
             Ok(path) => {
+                println!("path ok"); 
                 let mut tflist: Vec<Transform> = Vec::new();
                 let mut first = from.clone();
                 for intermediate in path {
