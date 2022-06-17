@@ -18,8 +18,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     sub.for_each(|msg| {
-        let tf = listener.lookup_transform("base_link", "odom", Time { sec: 0, nanosec: 0 }, msg);
-        println!("tf {:?}", tf);
+        let t = Time {sec: 1645594958, nanosec: 627320528}; 
+        let tf = listener.lookup_transform("base_link", "odom", t, msg);
+        match tf {
+            Ok(pose) => println!("pose {:?}", pose), 
+            Err(_e) => {},
+        }
         future::ready(())
     })
     .await;
