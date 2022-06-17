@@ -122,7 +122,7 @@ impl TfIndividualTransformChain {
         if self.static_tf {
             return true;
         }
-        println!("self.transform_chain {:?}", self.transform_chain); 
+        // println!("self.transform_chain {:?}", self.transform_chain); 
         !matches!(self.transform_chain.binary_search(&OrderedTF {
             tf: TransformStamped {
                 header: Header {

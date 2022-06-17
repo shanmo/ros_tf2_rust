@@ -26,11 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     sub.for_each(|msg| {
-        let now = clock.get_now().unwrap();
-        let time = r2r::Clock::to_builtin_time(&now);
-        println!("now {:?}", time); 
-        let tf = listener.lookup_transform("base_link", "odom", time, msg);
-        // println!("tf {:?}", tf);
+        let tf = listener.lookup_transform("base_link", "odom", Time {sec: 1645594958, nanosec: 627320528}, msg);
         future::ready(())
     })
     .await;
