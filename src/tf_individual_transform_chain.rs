@@ -5,7 +5,12 @@ use r2r::geometry_msgs::msg::TransformStamped;
 use r2r::std_msgs::msg::Header; 
 
 use crate::{
-    ordered_tf::{OrderedTF, get_nanos_from_duration, get_nanos_from_time},
+    ordered_tf::{
+        OrderedTF, 
+        get_nanos_from_duration, 
+        get_nanos_from_time,
+        convert_nanos_to_duration,
+    },
     tf_error::TfError,
     transforms::{
         interpolate, 
@@ -46,7 +51,7 @@ impl TfIndividualTransformChain {
         }
 
         let time_to_keep = if get_nanos_from_time(&self.latest_stamp) > get_nanos_from_duration(&self.cache_duration) {
-            Duration { sec: self.latest_stamp.sec - self.cache_duration.sec, nanosec: self.latest_stamp.nanosec - self.cache_duration.nanosec }
+            convert_nanos_to_duration(get_nanos_from_time(&self.latest_stamp) - get_nanos_from_duration(&self.cache_duration))
         } else {
             Duration { sec: 0, nanosec: 0 }
         };
@@ -105,8 +110,10 @@ impl TfIndividualTransformChain {
                     .tf
                     .child_frame_id
                     .clone();
-                let total_duration = Duration{ sec: time2.sec - time1.sec, nanosec: time2.nanosec - time1.nanosec };
-                let desired_duration = Duration{ sec: time.sec - time1.sec, nanosec: time.nanosec - time1.nanosec };
+
+                let total_duration = convert_nanos_to_duration(get_nanos_from_time(&time2) - get_nanos_from_time(&time1)); 
+                let desired_duration = convert_nanos_to_duration(get_nanos_from_time(&time) - get_nanos_from_time(&time1)); 
+
                 let weight = 1.0 - 
                     get_nanos_from_duration(&desired_duration) as f64 / 
                     get_nanos_from_duration(&total_duration) as f64;

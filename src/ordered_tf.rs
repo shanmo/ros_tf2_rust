@@ -11,6 +11,12 @@ pub fn get_nanos_from_time(t: &Time) -> i64 {
     i64::from(t.sec) * 1_000_000_000 + i64::from(t.nanosec)
 }
 
+pub fn convert_nanos_to_duration(n: i64) -> Duration {
+    let sec = n / 1_000_000_000;
+    let nanosec = n % 1_000_000_000;
+    Duration { sec: sec as i32, nanosec: nanosec as u32 }
+}   
+
 #[derive(Clone, Debug)]
 pub(crate) struct OrderedTF {
     pub(crate) tf: TransformStamped,

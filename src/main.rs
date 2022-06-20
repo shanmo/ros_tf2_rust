@@ -22,10 +22,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // let time = r2r::Clock::to_builtin_time(&now);
         // println!("rostime: {:?}", time);
         // println!("msg time: {:?}", msg.transforms[0].header.stamp);
-        let time = msg.transforms[0].header.stamp.clone();
+        let mut time = msg.transforms[0].header.stamp.clone();
+        time.nanosec -= 1; 
         let tf = listener.lookup_transform("base_link", "odom", time, msg);
         match tf {
-            Ok(pose) => println!("pose {:?}", pose), 
+            Ok(pose) => println!("interpolated pose\n{:?}", pose), 
             Err(_e) => {},
         }
         future::ready(())
