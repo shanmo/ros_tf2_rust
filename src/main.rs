@@ -2,8 +2,6 @@ use tf_rosrust::TfListener;
 use futures::future;
 use futures::stream::StreamExt;
 use r2r::QosProfile;
-// use r2r::builtin_interfaces::msg::{Duration, Time};
-use r2r::builtin_interfaces::msg::Time;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,9 +15,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         node.spin_once(std::time::Duration::from_millis(100));
     });
 
+    // let mut clock = r2r::Clock::create(r2r::ClockType::RosTime)?;
+
     sub.for_each(|msg| {
-        let t = Time {sec: 1645594958, nanosec: 627320528}; 
-        let tf = listener.lookup_transform("base_link", "odom", t, msg);
+        // let now = clock.get_now().unwrap();
+        // let time = r2r::Clock::to_builtin_time(&now);
+        // println!("rostime: {:?}", time);
+        // println!("msg time: {:?}", msg.transforms[0].header.stamp);
+        let time = msg.transforms[0].header.stamp.clone();
+        let tf = listener.lookup_transform("base_link", "odom", time, msg);
         match tf {
             Ok(pose) => println!("pose {:?}", pose), 
             Err(_e) => {},
